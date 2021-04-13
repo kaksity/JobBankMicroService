@@ -5,30 +5,44 @@ module.exports = async(req,res) => {
     try {
 
         const Type = req.query.type;
-
+	const Page = req.query.page;
+	const Size = req.query.size;
+	
         //Some Simple Validation
         QueryParams = {};
         
-        if(Type == undefined){
+        if(Type == undefined || Page == undefined || Size == undefined){
             return res.status(400).json({
                 success:false,
-                message:'You must add a query parameter with the type'
+                message:'You must add a query parameter with the type, page & size'
             });
         }else if(Validator.isEmpty(Type) || (Type != 'true' && Type != 'false')){
             return res.status(400).json({
                 success:false,
                 message:'type must be true or false'
             });
+        }else if (Validator.isEmpty(Page) || isNaN(Page) == true){
+        	return res.status(400).json({
+               success:false,
+            	message:'Page is required and must be numeric'
+       	});
         }
-
-
-        let TotalNumberRecord = await Profile.findAll({
-            where:{
-                profile_completed:Type,
-            }
-        });
+        else if (Validator.isEmpty(Size) || isNaN(Size) == true){
+        	return res.status(400).json({
+               success:false,
+            	message:'Size is required and must be numeric'
+       	});
+        }
+	else if (Size > 1000){
+        	return res.status(400).json({
+               success:false,
+            	message:'Maximun Allowable Page Size is 1000'
+       	});
+        }
+              
+        const OffSet = (Page - 1 ) * Size;
         
-        let result = await Profile.findAll({
+        let result = await Profile.findAndCountAll({
             attributes:['id','firstname','middlename','lastname','gender','phone','highest_education_level','lga_id','lga.name'],
             where:{
                 profile_completed:Type
@@ -40,10 +54,24 @@ module.exports = async(req,res) => {
             order:[
                 ['id','DESC']
             ],
+            offset:OffSet,
+            limit:Size
         });
 
+
+	let TotalNumberOfRecord = result.count;
+	
+	let TotalNumberOfPages =  Math.floor(TotalNumberOfRecord / Size);
+	
+	if(TotalNumberOfRecord % Size != 0){
+		TotalNumberOfPages=TotalNumberOfPages+1;
+	}
+	
+	let DataResult = result.rows;
+	
         let data = [];
-        result.forEach(element => {
+        
+        DataResult.forEach(element => {
             data.push({
                 id:element.id,
                 full_name:`${element.firstname} ${element.lastname} ${element.middlename}`,
@@ -53,14 +81,14 @@ module.exports = async(req,res) => {
                 lga:element.lga_id == null?'':element.lga.name,
             });
         })
-
+	
         return res.status(200).json({
             success:true,
             message:'Retrieved Profile Successfully',
             data:data,
             links:{
-                total_number_record:TotalNumberRecord.length,
-                total_number_pages:Math.floor(TotalNumberRecord.length/1000),
+                total_number_record:TotalNumberOfRecord,
+                total_number_pages:TotalNumberOfPages,
                 items_return:data.length,
             }
         })       
