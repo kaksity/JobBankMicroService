@@ -1,4 +1,5 @@
 const Profile = require('../models/Profile');
+const EducationLevel = require('../models/EducationLevel');
 const LGA = require('../models/LGA')
 const Excel = require('excel4node');
 const path = require('path');
@@ -29,7 +30,13 @@ module.exports = async(req,res)=>{
             QueryOptions.marital_status = MaritalStatus;
         }
         if(Qualification != undefined){
-            QueryOptions.highest_education_level = Qualification;
+            const result = await EducationLevel.findOne({
+              where:{
+                id:Qualification
+              }
+            });
+
+            QueryOptions.highest_education_level = result.name;
         }
         if(Gender != undefined){
             QueryOptions.gender = Gender;
@@ -50,7 +57,7 @@ module.exports = async(req,res)=>{
         })
 
         let data = [];
- 
+
         const Workbook = new Excel.Workbook({
             defaultFont:{
                 size:13,
@@ -63,7 +70,7 @@ module.exports = async(req,res)=>{
             logLevel:0,
         });
         const WorkSheet = Workbook.addWorksheet('sheet 1');
-        
+
         const HeaderStyle = Workbook.createStyle({
             alignment:{
                 horizontal:'center'
@@ -122,7 +129,7 @@ module.exports = async(req,res)=>{
         for(let i = 2; i < 11; i++){
             WorkSheet.column(i).setWidth(30);
         }
-        
+
         WorkSheet.cell(1,1).string("S/No").style(HeaderStyle);
         WorkSheet.cell(1,2).string("First Name").style(HeaderStyle);
         WorkSheet.cell(1,3).string("Middle Name").style(HeaderStyle);
@@ -132,24 +139,24 @@ module.exports = async(req,res)=>{
         WorkSheet.cell(1,7).string("Phone Number").style(HeaderStyle);
         WorkSheet.cell(1,8).string("Highest Qualification").style(HeaderStyle);
         WorkSheet.cell(1,9).string("Marital Status").style(HeaderStyle);
-        WorkSheet.cell(1,10).string("Local Government Area").style(HeaderStyle); 
-        
+        WorkSheet.cell(1,10).string("Local Government Area").style(HeaderStyle);
+
         let Count =1;
         let Row = 2
-       
+
         result.forEach(element => {
-            
+
             WorkSheet.cell(Row,1).number(Count).style(BodyStyle);
             WorkSheet.cell(Row,2).string(element.firstname).style(BodyStyle);
             WorkSheet.cell(Row,3).string(element.middlename).style(BodyStyle);
             WorkSheet.cell(Row,4).string(element.lastname).style(BodyStyle);
             WorkSheet.cell(Row,5).string(element.gender).style(BodyStyle);
-            WorkSheet.cell(Row,6).bool(element.educated).style(BodyStyle);
+            WorkSheet.cell(Row,6).string((element.educated == true) ? 'Yes' : 'No').style(BodyStyle);
             WorkSheet.cell(Row,7).string(element.phone).style(BodyStyle);
             WorkSheet.cell(Row,8).string(element.highest_education_level).style(BodyStyle);
             WorkSheet.cell(Row,9).string(element.marital_status).style(BodyStyle);
             WorkSheet.cell(Row,10).string(element.lga.name).style(BodyStyle);
-            
+
             Count += 1;
             Row += 1;
         });
@@ -169,5 +176,5 @@ module.exports = async(req,res)=>{
             success:false,
             message:'Something went wrong. Try again'
         });
-    }   
+    }
 }

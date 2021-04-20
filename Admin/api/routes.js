@@ -30,7 +30,7 @@ Router.get('/education-level',[VerifyToken,VerifyAdmin],EducationLevelController
 //Get SkillSet List
 Router.get('/skills',[VerifyToken,VerifyAdmin],SkillController)
 
-//Get LGA 
+//Get LGA
 Router.get('/lga',[VerifyToken,VerifyAdmin],LGAController);
 
 
