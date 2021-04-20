@@ -13,6 +13,7 @@ module.exports = async(req,res)=>{
         let Grade = req.query.grade;
         let CourseName = req.query.course;
 
+
         let QueryOptions = {};
 
         if(Completed != undefined){
@@ -30,11 +31,15 @@ module.exports = async(req,res)=>{
                 [Sequelize.Op.iLike]:`%${CourseName}`,
             };
         }
+
         let result = await Education.findAll({
             where:QueryOptions,
             include:[{
                 model:Profile,
-                attributes:['firstname','middlename','lastname','gender','phone']
+                attributes:['firstname','middlename','lastname','gender','phone'],
+                where:{
+                  profile_completed:true,
+                }
             },{
                 model:EducationLevel,
                 attributes:['name'],
@@ -53,7 +58,7 @@ module.exports = async(req,res)=>{
             logLevel:0,
         });
         const WorkSheet = Workbook.addWorksheet('sheet 1');
-        
+
         const HeaderStyle = Workbook.createStyle({
             alignment:{
                 horizontal:'center'
@@ -112,7 +117,7 @@ module.exports = async(req,res)=>{
         for(let i = 2; i < 14; i++){
             WorkSheet.column(i).setWidth(30);
         }
-        
+
         WorkSheet.cell(1,1).string("S/No").style(HeaderStyle);
         WorkSheet.cell(1,2).string("First Name").style(HeaderStyle);
         WorkSheet.cell(1,3).string("Middle Name").style(HeaderStyle);
@@ -126,17 +131,18 @@ module.exports = async(req,res)=>{
         WorkSheet.cell(1,11).string("School Name").style(HeaderStyle);
         WorkSheet.cell(1,12).string("Year Of Admission").style(HeaderStyle);
         WorkSheet.cell(1,13).string("Year of Graduation").style(HeaderStyle);
-        
-        
+
+
         let Count =1;
         let Row = 2
-    
+
+
         result.forEach(element => {
-            
+
             WorkSheet.cell(Row,1).number(Count).style(BodyStyle);
-            WorkSheet.cell(Row,2).string(element.profile.firstname).style(BodyStyle);
-            WorkSheet.cell(Row,3).string(element.profile.middlename).style(BodyStyle);
-            WorkSheet.cell(Row,4).string(element.profile.lastname).style(BodyStyle);
+            WorkSheet.cell(Row,2).string((element.profile.firstname == null) ?'':element.profile.firstname).style(BodyStyle);
+            WorkSheet.cell(Row,3).string((element.profile.middlename == null) ?'':element.profile.middlename).style(BodyStyle);
+            WorkSheet.cell(Row,4).string((element.profile.lastname == null) ?'':element.profile.lastname).style(BodyStyle);
             WorkSheet.cell(Row,5).string(element.profile.gender).style(BodyStyle);
             WorkSheet.cell(Row,6).string(element.profile.phone).style(BodyStyle);
             WorkSheet.cell(Row,7).string(element.completed).style(BodyStyle);
@@ -149,7 +155,7 @@ module.exports = async(req,res)=>{
             Count += 1;
             Row += 1;
         });
-    
+
         let FileName = Date.now();
         Workbook.write(`public/${FileName}.xlsx`);
 
@@ -164,4 +170,4 @@ module.exports = async(req,res)=>{
             message:'Something went wrong. Try again',
         });
     }
-}  
+}
