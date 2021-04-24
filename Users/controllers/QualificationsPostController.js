@@ -3,7 +3,7 @@ const Qualification = require('../models/Qualification');
 const db = require('../config/db');
 
 module.exports = async(req,res)=>{
-   
+
     let CourseName = req.body.course_name;
     let SchoolName = req.body.school_name;
     let EducationLevel = req.body.education_level;
@@ -16,7 +16,7 @@ module.exports = async(req,res)=>{
     let File = req.file;
     let ProfileId = req.user.ProfileId;
     let transaction = await db.transaction();
-    
+
     try {
 
         let EducationResult = await Education.create({
@@ -30,7 +30,7 @@ module.exports = async(req,res)=>{
             education_level_id:EducationLevel,
             user_profile_id: ProfileId
         })
-
+        console.log(File);
         await Qualification.create({
             file_name:File.path,
             file_url:`http://${process.env.HOSTNAME}:${process.env.PORT}/` + File.path,
@@ -45,6 +45,7 @@ module.exports = async(req,res)=>{
         });
     } catch (e) {
         await transaction.rollback();
+        console.log(e);
         return res.status(500).json({
             success:false,
             message:'Something went wrong. Try again'

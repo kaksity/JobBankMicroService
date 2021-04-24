@@ -6,7 +6,7 @@ const bcryptjs = require('bcryptjs');
 const db = require('../config/db');
 
 module.exports = async(req,res)=>{
-    try {   
+    try {
         let FirstName = req.body.first_name;
         let LastName = req.body.last_name;
         let EmailAddress = req.body.email_address;
@@ -46,7 +46,12 @@ module.exports = async(req,res)=>{
                 message:'Confirm Password is required'
             });
         }
-
+        else if(validator.isEmail(EmailAddress) == false){
+            return res.status(400).json({
+                success:false,
+                message:'Email Address is invalid'
+            });
+        }
         //Check if the Length of the Phone Number is 11
         if(PhoneNumber.length != 11){
             return res.status(400).json({
@@ -70,7 +75,6 @@ module.exports = async(req,res)=>{
                 message:'Password must match Confirm Password'
             });
         }
-
         let transaction = await db.transaction();
         //Convert the Email Address to small case
         EmailAddress = EmailAddress.toLowerCase();
@@ -92,9 +96,9 @@ module.exports = async(req,res)=>{
             // Since the Email Address has not been taken. Hash the Password and been the process to insert data into db
 
             let HashedPassword = await bcryptjs.hash(Password,10);
-            
+
             try {
-                
+
                 let ProfileResult = await Profile.create({
                     firstname:FirstName,
                     lastname:LastName,
@@ -126,19 +130,19 @@ module.exports = async(req,res)=>{
                 });
 
                 await transaction.commit();
-                
+
                 return res.status(201).json({
                     success:true,
                     message:'New User was created Successfully'
                 });
             } catch (e) {
-                
+
                 await transaction.rollback();
                 console.log(e);
                 return res.status(500).json({
                     success:false,
                     message:'Something went wrong. Try again'
-                });    
+                });
             }
 
         } catch (e) {

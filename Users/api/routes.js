@@ -33,67 +33,67 @@ const UploadAvatar = require('../middleware/UploadAvatar');
 const UploadQualifications = require('../middleware/UploadQualifications');
 
 //Register Routes
-Router.post('/login',LoginController);
+Router.post('/login', LoginController);
 
 //Login Routes
-Router.post('/register',RegisterController);
+Router.post('/register', RegisterController);
 
 //Get Profile routes
-Router.get('/profile',[VerifyToken],ProfileGetController);
+Router.get('/profile', [VerifyToken], ProfileGetController);
 
 //Update Profile 
-Router.put('/profile',[VerifyToken],ProfileUpdateController)
+Router.put('/profile', [VerifyToken], ProfileUpdateController)
 
 //Get Education level
-Router.get('/education-level',EducationLevelController);
+Router.get('/education-level', EducationLevelController);
 
 //Get LGA 
-Router.get('/lga',LGAController)
+Router.get('/lga', LGAController)
 
 //Get Skills
-Router.get('/skills',SkillController)
+Router.get('/skills', SkillController)
 
 //Get Additional Skills
-Router.get('/additional-skills',[VerifyToken],AdditionalSkillsGetController);
+Router.get('/additional-skills', [VerifyToken], AdditionalSkillsGetController);
 
 //Post Additional Skills
-Router.post('/additional-skills',[VerifyToken],AdditionalSkillsPostController);
+Router.post('/additional-skills', [VerifyToken], AdditionalSkillsPostController);
 
 //Delete Additional Skills
-Router.delete('/additional-skills/:id',[VerifyToken],AdditionalSkillsDeleteController);
+Router.delete('/additional-skills/:id', [VerifyToken], AdditionalSkillsDeleteController);
 
 //Get Passport
-Router.get('/passport',[VerifyToken],PassportGetController)
+Router.get('/passport', [VerifyToken], PassportGetController)
 
 //Update Passport
-Router.put('/passport',[VerifyToken,UploadAvatar],PassportUpdateController)
+Router.put('/passport', [VerifyToken, UploadAvatar], PassportUpdateController)
 
 //Get Work Experince
-Router.get('/work-experiences',[VerifyToken],WorkExperienceGetController);
+Router.get('/work-experiences', [VerifyToken], WorkExperienceGetController);
 
 //Post Work Experience
-Router.post('/work-experiences',[VerifyToken],WorkExperiencePostController);
+Router.post('/work-experiences', [VerifyToken], WorkExperiencePostController);
 
 //Delete Work Experience
-Router.delete('/work-experiences/:id',[VerifyToken],WorkExperienceDeleteController);
+Router.delete('/work-experiences/:id', [VerifyToken], WorkExperienceDeleteController);
 
 //Get Qualifications
-Router.get('/qualifications',[VerifyToken],QualificationsGetController);
+Router.get('/qualifications', [VerifyToken], QualificationsGetController);
 
 //Get Qualifications Details
-Router.get('/qualifications/:id',[VerifyToken],QualificationsDetailsGetController);
+Router.get('/qualifications/:id', [VerifyToken], QualificationsDetailsGetController);
 
 //Delete Qualifications
-Router.delete('/qualifications/:id',[VerifyToken],QualificationsDeleteController);
+Router.delete('/qualifications/:id', [VerifyToken], QualificationsDeleteController);
 
 //Post a new Qualification
-Router.post('/qualifications',[VerifyToken,UploadQualifications],QualificationsPostController);
+Router.post('/qualifications', [VerifyToken, UploadQualifications], QualificationsPostController);
 
 //PUT change Password
-Router.put('/change-password',[VerifyToken],ChnagePasswordPutController);
+Router.put('/change-password', [VerifyToken], ChnagePasswordPutController);
 
 //Post Forgot Password
-Router.post('/forgot-password',ForgotPasswordPostController);
+Router.post('/forgot-password', ForgotPasswordPostController);
 //Get the Preview Data
-Router.get('/preview',[VerifyToken],PreviewGetController)
+Router.get('/preview', [VerifyToken], PreviewGetController)
 module.exports = Router;
